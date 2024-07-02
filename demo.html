@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>简单地图</title>
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <style type="text/css">
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+    }
+
+    * {
+      margin: 0px;
+      padding: 0px;
+    }
+
+    body,
+    button,
+    input,
+    select,
+    textarea {
+      font: 12px/16px Verdana, Helvetica, Arial, sans-serif;
+    }
+
+    p {
+      width: 603px;
+      padding-top: 3px;
+      overflow: hidden;
+    }
+
+    .btn {
+      width: 142px;
+    }
+
+    #container {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+  <script charset="utf-8" src="https://map.qq.com/api/js?v=2.exp&key=OB4BZ-D4W3U-B7VVO-4PJWW-6TKDJ-WPB77"></script>
+  <script>
+    var MAP
+    async function getLocation() {
+      if (await navigator.geolocation) {
+        return navigator.geolocation.getCurrentPosition(showPosition, showError);
+      } else {
+        console.error('当前浏览器不支持地理定位')
+      }
+    }
+    // 获取定位成功，显示位置信息
+    function showPosition(position) {
+      var curr = position.coords
+      console.log(
+        'Latitude(纬度): ' + position.coords.latitude + // 纬度
+        '<br>Longitude(经度): ' + position.coords.longitude // 经度
+      )
+      MAP.panTo(new qq.maps.LatLng(position.coords.latitude, position.coords.longitude));
+      MAP.zoomTo(16);
+      // 打标
+      const marker = new qq.maps.Marker({
+        position: new qq.maps.LatLng(position.coords.latitude, position.coords.longitude),
+        map: MAP
+      });
+      return curr
+    }
+    // 获取定位失败，显示错误信息
+    function showError(error) {
+      switch (error.code) {
+        case error.PERMISSION_DENIED:
+          console.log = ('用户拒绝地理定位请求')
+          break;
+      }
+    }
+
+    //初始化地图函数  自定义函数名init
+    var init = function (curr) {
+      //定义map变量 调用 qq.maps.Map() 构造函数   获取地图显示容器
+      MAP = new qq.maps.Map(document.getElementById("container"), {
+        center: new qq.maps.LatLng(curr.latitude, curr.longitude),      // 地图的中心地理坐标。
+        zoom: 10     // 放大倍数（8为区域级 4为国家级 10为市县级）
+      });
+    }
+
+    window.onload = async function () {
+      try {
+        // 初始化地图为gz
+        init({ latitude: 23.13586376420126, longitude: 113.3245201066893 });
+
+        // 更新地图
+        const position = await getLocation();
+        console.log(position)
+
+        // 弹出输入框
+        const name = prompt("请输入您的名字:");
+
+        // 提交fetch请求
+        const response = await fetch("https://example.com/submit", {
+          method: "POST",
+          body: JSON.stringify({ name }),
+          headers: {
+            "Content-Type": "application/json"
+          }
+        });
+
+        if (response.ok) {
+          alert("提交成功！");
+        } else {
+          alert("提交失败，请重试！");
+        }
+      } catch (error) {
+        console.error("获取位置失败:", error);
+      }
+
+    }
+  </script>
+</head>
+
+<body>
+  <!--   定义地图显示容器   -->
+  <div id="container"></div>
+</body>
+
+</html>
