@@ -1,7 +1,9 @@
 # 腾讯地图demo
+> 实现类似于共享定位的功能，增加了一点自己的小动画
 
-**根据[腾讯地图webAPI](https://lbs.qq.com/service/webService/webServiceGuide/overview)**，封装了几个常用的场景以供展示使用（实用demo）
+使用方法：
+前端：
+index.html
 
-具体使用方法可见腾讯地图开放文档
-
-index为索引页
+后端：
+server.py
