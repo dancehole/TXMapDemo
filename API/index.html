@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>这将决定我们晚上去哪里吃饭！！</title>
+<meta name="viewport"
+  content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<style type="text/css" >
+
+  /*迁移到index.css*/
+</style>
+<link rel="stylesheet" href="./index.css">
+<script charset="utf-8" src="https://map.qq.com/api/js?v=2.exp&key=OB4BZ-D4W3U-B7VVO-4PJWW-6TKDJ-WPB77"></script>
+<script src="./example.js"></script>
+<script src="./index.js"></script>
+</head>
+
+<body>
+  <!--   定义地图显示容器   -->
+  <div id="container"></div>
+  <!--1-->
+  <h1 class="console" id="text"></h1>
+  <!-- 自定义模态对话框模板 -->
+  <div id="customPrompt" style="display:block;z-index: 99999999;">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title">请输入您的名字:</h3>
+          <!-- <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button> -->
+        </div>
+        <div class="modal-body">
+          <input type="text" id="promptInput">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" onclick="handleConfirm()">确定</button>
+          <!-- <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button> -->
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>
