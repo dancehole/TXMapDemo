@@ -27,7 +27,6 @@
     }
 
     p {
-      width: 603px;
       padding-top: 3px;
       overflow: hidden;
     }
@@ -42,14 +41,16 @@
       height: 20%;
       display: flex;
       justify-content: center;
+      align-items: center;
       flex-wrap: wrap;
+      flex-direction: row;
     }
 
     .button-text-group {
       display: flex;
       flex-direction: column;
       align-items: center;
-      margin-right: 20px;
+      margin: 3px 5px;
     }
 
     .button-text-group:last-child {
@@ -74,21 +75,11 @@
   <div id="console">
     <!-- 第一组 -->
     <div class="button-text-group">
-      <p>Button 1 Text</p>
-      <button>Button 1</button>
+      <p>重新定位</p>
+      <button id="reLocateEvent">重新定位</button>
     </div>
+    <!--剩下的使用js动态拼接-->
 
-    <!-- 第二组 -->
-    <div class="button-text-group">
-      <p>Button 2 Text</p>
-      <button>Button 2</button>
-    </div>
-
-    <!-- 第三组 -->
-    <div class="button-text-group">
-      <p>Button 3 Text</p>
-      <button>Button 3</button>
-    </div>
   </div>
 </body>
 
