@@ -8,7 +8,7 @@
   <title>绘制几何图形</title>
 </head>
 <script charset="utf-8"
-  src="https://map.qq.com/api/gljs?libraries=tools&v=1.exp&key=OB4BZ-D4W3U-B7VVO-4PJWW-6TKDJ-WPB77"></script>
+  src="https://map.qq.com/api/gljs?libraries=tools,geometry&v=1.exp&key=OB4BZ-D4W3U-B7VVO-4PJWW-6TKDJ-WPB77"></script>
 <style type="text/css">
   html,
   body {
@@ -205,107 +205,279 @@
 
           console.log('绘制的折线路径点：', drawnPath);
           // 开始轨迹回放
-          startReplay(drawnPath);
+          startReplay3D(drawnPath);
         }
       });
     }
 
-    function startReplay(drawnPath) {
-      // 创建折线层
+
+    function startReplay3D(drawnPath) {
+      start()
+
+      function start() {
+        // 禁用编辑器
+        editor.disable()
+        map.easeTo(
+          {
+            zoom: 20,
+            rotation: 180,
+            pitch: 80
+          },
+          {
+            duration: 1500
+          }
+        );
+        map.on('idle', carMove);
+      };
+
+      var roation;
+      var position;
+
+      // MultiPolyline文档：https://lbs.qq.com/webApi/javascriptGL/glDoc/glDocVector#1
       var polylineLayer = new TMap.MultiPolyline({
-        map,
+        map, // 绘制到目标地图
+        // 折线样式定义
         styles: {
           style_blue: new TMap.PolylineStyle({
-            color: '#3777FF',
-            width: 4,
-            borderWidth: 2,
-            borderColor: '#FFF',
-            lineCap: 'round',
-            eraseColor: 'rgba(190,188,188,1)',
+            color: '#2A88FF', // 线填充色
+            width: 8, // 折线宽度
+            borderWidth: 3, // 边线宽度
+            borderColor: '#0569FF', // 边线颜色
+            lineCap: 'round', // 线端头方式
+            showArrow: true
           }),
+          style_gray: new TMap.PolylineStyle({
+            color: '#ccc', // 线填充色
+            width: 8, // 折线宽度
+            borderWidth: 3, // 边线宽度
+            borderColor: '#FFF', // 边线颜色
+            lineCap: 'round' // 线端头方式
+          })
         },
         geometries: [
           {
-            id: 'erasePath',
+            id: 'path1',
             styleId: 'style_blue',
-            paths: drawnPath,
+            paths: drawnPath
           },
-        ],
+          {
+            id: 'path2',
+            styleId: 'style_blue',
+            paths: drawnPath
+          }
+        ]
       });
 
-      // 创建标记
+      // marker文档：https://lbs.qq.com/webApi/javascriptGL/glDoc/glDocMarker
       var marker = new TMap.MultiMarker({
+        id: 'car',
         map,
         styles: {
           'car-down': new TMap.MarkerStyle({
-            width: 40,
-            height: 40,
-            anchor: { x: 20, y: 20 },
+            width: 48,
+            height: 72,
+            anchor: {
+              x: 24,
+              y: 36
+            },
             faceTo: 'map',
             rotate: 180,
-            src: 'https://mapapi.qq.com/web/lbs/javascriptGL/demo/img/car.png',
+            src: 'https://mapapi.qq.com/web/mapComponents/componentsTest/zyTest/static/model_taxi.png?a=1'
           }),
           start: new TMap.MarkerStyle({
-            width: 25,
-            height: 35,
-            anchor: { x: 16, y: 32 },
-            src: 'https://mapapi.qq.com/web/lbs/javascriptGL/demo/img/start.png',
+            anchor: {
+              x: 16,
+              y: 32
+            },
+            src: 'https://mapapi.qq.com/web/miniprogram/demoCenter/images/marker-start.png'
           }),
           end: new TMap.MarkerStyle({
-            width: 25,
-            height: 35,
-            anchor: { x: 16, y: 32 },
-            src: 'https://mapapi.qq.com/web/lbs/javascriptGL/demo/img/end.png',
-          }),
+            src: 'https://mapapi.qq.com/web/miniprogram/demoCenter/images/marker-end.png'
+          })
         },
         geometries: [
           {
             id: 'car',
             styleId: 'car-down',
-            position: drawnPath[0], // 假设第一个点为起始位置
+            position: drawnPath[0]
           },
           {
             id: 'start',
             styleId: 'start',
-            position: drawnPath[0],
+            position: drawnPath[0]
           },
           {
             id: 'end',
             styleId: 'end',
-            position: drawnPath[drawnPath.length - 1], // 假设最后一个点为结束位置
-          },
-        ],
+            position: drawnPath[drawnPath.length - 1]
+          }
+        ]
       });
 
-      // 轨迹回放
-      marker.moveAlong(
-        {
-          car: {
-            path: drawnPath,
-            speed: 250,
+      function carMove() {
+        map.off('idle', carMove);
+        marker.moveAlong(
+          {
+            car: {
+              path: drawnPath,
+              speed: 200
+            }
           },
-        },
-        {
-          autoRotation: true,
-        }
-      );
+          {
+            autoRotation: true
+          }
+        );
+      }
 
-      // 全局模式回放
-      marker.on('moving', (e) => {
-        var passedLatLngs = e.car && e.car.passedLatLngs;
-        if (passedLatLngs) {
-          polylineLayer.eraseTo(
-            'erasePath',
-            passedLatLngs.length - 1,
-            passedLatLngs[passedLatLngs.length - 1]
-          );
-        }
+      marker.on('moving', function (e) {
+        if (!e.car) return;
+        roation = TMap.geometry.computeHeading(
+          e.car.passedLatLngs[e.car.passedLatLngs.length - 2],
+          e.car.passedLatLngs[e.car.passedLatLngs.length - 1]
+        );
+        position = TMap.geometry.computeDestination(
+          marker.getGeometryById('car').position,
+          roation,
+          60
+        );
+        map.easeTo(
+          {
+            center: position,
+            rotation: e.car.angle,
+            zoom: 20,
+            pitch: 70
+          },
+          {
+            duration: 300
+          }
+        );
+        // 移动路线置灰
+        polylineLayer.updateGeometries([
+          {
+            id: 'path2',
+            styleId: 'style_gray',
+            paths: e.car.passedLatLngs
+          }
+        ]);
       });
 
-      
+      // 销毁路径，回到全局模式，启用编辑器
+      marker.on('move_ended', function (e) {
+        console.log('move end!')
+        map.easeTo(
+          {
+            center: drawnPath[0],
+            zoom: 12,
+            rotation: 0,
+            pitch: 0
+          },
+          {
+            duration: 1000
+          });
+        editor.enable()
+        // 移除marker
+        marker.setMap(null)
+        marker = null
+        // 清除线
+      });
+
+
     }
 
-    
+    // function startReplay2D(drawnPath) {
+    //   // 创建折线层
+    //   var polylineLayer = new TMap.MultiPolyline({
+    //     map,
+    //     styles: {
+    //       style_blue: new TMap.PolylineStyle({
+    //         color: '#3777FF',
+    //         width: 4,
+    //         borderWidth: 2,
+    //         borderColor: '#FFF',
+    //         lineCap: 'round',
+    //         eraseColor: 'rgba(190,188,188,1)',
+    //       }),
+    //     },
+    //     geometries: [
+    //       {
+    //         id: 'erasePath',
+    //         styleId: 'style_blue',
+    //         paths: drawnPath,
+    //       },
+    //     ],
+    //   });
+
+    //   // 创建标记
+    //   var marker = new TMap.MultiMarker({
+    //     map,
+    //     styles: {
+    //       'car-down': new TMap.MarkerStyle({
+    //         width: 40,
+    //         height: 40,
+    //         anchor: { x: 20, y: 20 },
+    //         faceTo: 'map',
+    //         rotate: 180,
+    //         src: 'https://mapapi.qq.com/web/lbs/javascriptGL/demo/img/car.png',
+    //       }),
+    //       start: new TMap.MarkerStyle({
+    //         width: 25,
+    //         height: 35,
+    //         anchor: { x: 16, y: 32 },
+    //         src: 'https://mapapi.qq.com/web/lbs/javascriptGL/demo/img/start.png',
+    //       }),
+    //       end: new TMap.MarkerStyle({
+    //         width: 25,
+    //         height: 35,
+    //         anchor: { x: 16, y: 32 },
+    //         src: 'https://mapapi.qq.com/web/lbs/javascriptGL/demo/img/end.png',
+    //       }),
+    //     },
+    //     geometries: [
+    //       {
+    //         id: 'car',
+    //         styleId: 'car-down',
+    //         position: drawnPath[0], // 假设第一个点为起始位置
+    //       },
+    //       {
+    //         id: 'start',
+    //         styleId: 'start',
+    //         position: drawnPath[0],
+    //       },
+    //       {
+    //         id: 'end',
+    //         styleId: 'end',
+    //         position: drawnPath[drawnPath.length - 1], // 假设最后一个点为结束位置
+    //       },
+    //     ],
+    //   });
+
+    //   // 轨迹回放
+    //   marker.moveAlong(
+    //     {
+    //       car: {
+    //         path: drawnPath,
+    //         speed: 250,
+    //       },
+    //     },
+    //     {
+    //       autoRotation: true,
+    //     }
+    //   );
+
+    //   // 全局模式回放
+    //   marker.on('moving', (e) => {
+    //     var passedLatLngs = e.car && e.car.passedLatLngs;
+    //     if (passedLatLngs) {
+    //       polylineLayer.eraseTo(
+    //         'erasePath',
+    //         passedLatLngs.length - 1,
+    //         passedLatLngs[passedLatLngs.length - 1]
+    //       );
+    //     }
+    //   });
+    // }
+
+
   </script>
 </body>
 
