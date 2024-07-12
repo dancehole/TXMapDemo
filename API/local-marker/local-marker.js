@@ -22,28 +22,28 @@ window.initMap = () => {
   //   qq.maps.event.removeListener(mapClickListener);
   // };
 
-  // Optional: 添加绘图工具【需要引入js】
-  var drawingManager = new qq.maps.drawing.DrawingManager({
-    drawingMode: qq.maps.drawing.OverlayType.MARKER,
-    drawingControl: true,
-    drawingControlOptions: {
-      position: qq.maps.ControlPosition.TOP_CENTER,
-      drawingModes: [
-        qq.maps.drawing.OverlayType.MARKER,
-        qq.maps.drawing.OverlayType.CIRCLE,
-        qq.maps.drawing.OverlayType.POLYGON,
-        qq.maps.drawing.OverlayType.POLYLINE,
-        qq.maps.drawing.OverlayType.RECTANGLE
-      ]
-    },
-    circleOptions: {
-      fillColor: new qq.maps.Color(255, 208, 70, 0.3),
-      strokeColor: new qq.maps.Color(88, 88, 88, 1),
-      strokeWeight: 3,
-      clickable: false
-    }
-  });
-  drawingManager.setMap(map);
+  // Optional: 添加绘图工具【需要引入js,这里暂时不引入了】
+  // var drawingManager = new qq.maps.drawing.DrawingManager({
+  //   drawingMode: qq.maps.drawing.OverlayType.MARKER,
+  //   drawingControl: true,
+  //   drawingControlOptions: {
+  //     position: qq.maps.ControlPosition.TOP_CENTER,
+  //     drawingModes: [
+  //       qq.maps.drawing.OverlayType.MARKER,
+  //       qq.maps.drawing.OverlayType.CIRCLE,
+  //       qq.maps.drawing.OverlayType.POLYGON,
+  //       qq.maps.drawing.OverlayType.POLYLINE,
+  //       qq.maps.drawing.OverlayType.RECTANGLE
+  //     ]
+  //   },
+  //   circleOptions: {
+  //     fillColor: new qq.maps.Color(255, 208, 70, 0.3),
+  //     strokeColor: new qq.maps.Color(88, 88, 88, 1),
+  //     strokeWeight: 3,
+  //     clickable: false
+  //   }
+  // });
+  // drawingManager.setMap(map);
 
   return map;
 };
@@ -81,7 +81,7 @@ const handleError = (error) => {
 const setupGeoLocation = () => {
   const map = initMap();
   MAP = map;
-  // 这里用原型链附带参数的方式携带map，但是可读性很差
+  // [获取当前地理位置]这里用原型链附带参数的方式携带map，但是可读性很差
   GeoLocationUtils.getLocation(handlePosition.bind(null, map), handleError);
 };
 
@@ -149,7 +149,7 @@ const event_a = () => {
     const marker = new qq.maps.Marker({
       icon: icon, // optional，自定义标记
       shadow: shadow, // optional,自定义阴影
-      animation: qq.maps.MarkerAnimation.DROP, // Optional可选，增加一个动画 BOUNCE跳动，DROP下落
+      animation: qq.maps.MarkerAnimation.BOUNCE, // Optional可选，增加一个动画 BOUNCE跳动，DROP下落
       draggable: true, // Optional可选，是否可拖拽
       position: event.latLng,
       map: MAP
