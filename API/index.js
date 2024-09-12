@@ -71,7 +71,7 @@ function getLocation() {
 async function getAndPostPosition(info) {
   try {
     // 提交fetch请求=>上传位置信息=>下拉所有人的位置信息
-    let response = await fetch("http://119.91.149.12:7705/submit_location", {
+    let response = await fetch("http://dancehole.cn:8082/submit_location", {
       method: "POST",
       body: JSON.stringify(info),
       headers: {
